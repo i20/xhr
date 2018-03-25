@@ -48,16 +48,16 @@ function each (object, callback) {
                 break;
 }
 
-function extend (original, with) {
+function extend (original, by) {
 
     var object = {};
 
-    each(original, function (i, j) {
-        object[i] = j;
+    each(original, function (key, value) {
+        object[key] = value;
     });
 
-    each(with, function (i, j) {
-        object[i] = j;
+    each(by, function (key, value) {
+        object[key] = value;
     });
 
     return object;
@@ -120,18 +120,21 @@ function digestHeaders (rawHeaders) {
 
         var sepIndex = rawHeaders[i].indexOf(':');
 
-        var headerName = rawHeaders[i]
-            .substring(0, sepIndex)
-            .trim()
-            .replace(/(^.)|(-.)/g, function ($0, $1, $2) {
-                return ($1 || $2).toUpperCase();
-            });
+        if (sepIndex !== -1) { // Avoid empty item or incorrect item at the end of the split
 
-        var headerValue = rawHeaders[i]
-            .substring(sepIndex + 1)
-            .trim();
+            var headerName = rawHeaders[i]
+                .substring(0, sepIndex)
+                .trim()
+                .replace(/(^.)|(-.)/g, function ($0, $1, $2) {
+                    return ($1 || $2).toUpperCase();
+                });
 
-        headers[ headerName ] = headerValue;
+            var headerValue = rawHeaders[i]
+                .substring(sepIndex + 1)
+                .trim();
+
+            headers[ headerName ] = headerValue;
+        }
     }
 
     return headers;
@@ -175,8 +178,8 @@ function XHR (params) {
     if (typeof params.data === 'object'){
 
         var data = [];
-        each(params.data, function (i, j) {
-            data.push(global.encodeURIComponent(i) + '=' + global.encodeURIComponent(j));
+        each(params.data, function (name, value) {
+            data.push(global.encodeURIComponent(name) + '=' + global.encodeURIComponent(value));
         });
 
         params.data = data.join('&');
