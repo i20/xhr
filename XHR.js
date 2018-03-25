@@ -10,7 +10,9 @@ var getXHR = global.ActiveXObject ? function () {
     throw 'Your browser doesn\'t support AJAX requests.';
 };
 
-var parseJSON = global.JSON ? global.JSON.parse : function (string) {
+var parseJSON = global.JSON ? function (string) {
+    return global.JSON.parse(string);
+} : function (string) {
     return global.eval('(' + string + ')');
 };
 
@@ -193,7 +195,9 @@ function XHR (params) {
             };
 
         xhr.open(params.method, params.url, params.async, params.user, params.password);
-        each(params.headers, xhr.setRequestHeader);
+        each(params.headers, function (name, value) {
+            xhr.setRequestHeader(name, value);
+        });
         xhr.send(params.data);
 
         // Synchronous mode
