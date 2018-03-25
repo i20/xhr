@@ -64,16 +64,11 @@ function extend (original, by) {
 }
 
 function clone (object) {
-
     return extend({}, object);
 }
 
 function endPromise (xhr, params, resolve, reject) {
-
-    xhr = digestXHR(xhr, params);
-
-    (200 <= xhr.status && xhr.status <= 206) || xhr.status === 304 ?
-        resolve(xhr) : reject(xhr);
+    ((200 <= xhr.status && xhr.status <= 206) || xhr.status === 304 ? resolve : reject)( digestXHR(xhr, params) );
 }
 
 function digestResponse (responseText, headers, params) {
@@ -104,11 +99,9 @@ function digestResponse (responseText, headers, params) {
     }
 
     // Then we are sure to have an explicit value as type
-    switch (type) {
-        case 'text': return responseText;
-        case 'json': return parseJSON(responseText);
-        case 'xml' : return parseXML(responseText);
-    }
+    return type === 'json' ? parseJSON(responseText) :
+           type === 'xml'  ? parseXML(responseText) :
+           responseText;
 }
 
 function digestHeaders (rawHeaders) {
