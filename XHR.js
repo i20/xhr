@@ -1,13 +1,15 @@
-(function (global, undefined) {
+(function (undefined) {
 
 'use strict';
+
+var global = typeof window === 'object' ? window : this;
 
 var getXHR = global.ActiveXObject ? function () {
     return new global.ActiveXObject('Microsoft.XMLHTTP');
 } : global.XMLHttpRequest ? function () {
     return new global.XMLHttpRequest();
 } : function () {
-    throw 'Your browser doesn\'t support AJAX requests.';
+    throw 'Context does not support AJAX requests';
 };
 
 var parseJSON = global.JSON ? function (string) {
@@ -23,17 +25,17 @@ var parseXML = global.DOMParser ? function (string) {
     doc.loadXML(string);
     return doc;
 } : function (string) {
-    throw 'Your browser doesn\'t support XML parsing.';
+    throw 'Context does not support XML parsing';
 };
 
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim#Polyfill
+// Polyfill https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim#Polyfill
 if (!global.String.prototype.trim) {
     global.String.prototype.trim = function () {
         return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
     };
 }
 
-// https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Date/now#Proth%C3%A8se_d'%C3%A9mulation_(polyfill)
+// Polyfill https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Date/now#Proth%C3%A8se_d'%C3%A9mulation_(polyfill)
 if (!global.Date.now) {
     global.Date.now = function () {
         return new global.Date().getTime();
@@ -152,7 +154,9 @@ function XHR (params) {
 
     // Avoid altering external references
     params.headers = clone(params.headers);
-    params.headers['Content-Type'] = params.contentType + '; charset=' + params.charset;
+
+    if (!params.headers['Content-Type'])
+        params.headers['Content-Type'] = params.contentType;
 
     if (!params.cache) {
 
@@ -213,12 +217,12 @@ XHR.defaultParams = {
 
     // 'auto' : response is parsed according to the Content-Type response header or text if no header
     // 'text' : no parsing is done
-    // 'json' : response is parsed as a json string
+    // 'json' : response is parsed as a JSON string
+    // 'xml'  : response is parsed as DOM string
     responseType: 'auto',
     async: true,
 
-    contentType: 'application/x-www-form-urlencoded',
-    charset: 'UTF-8',
+    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
 
     headers: {},
     data: null,
@@ -235,4 +239,4 @@ XHR.noConflict = function () {
 XHR.conflicted = global.XHR;
 global.XHR = XHR;
 
-})(this);
+})();
