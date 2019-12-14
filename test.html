@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="../promise/Promise.js"></script>
+        <script type="text/javascript" src="XHR.js"></script>
+        <script type="text/javascript">
+        XHR({
+            url: './README.md'
+        }).then(function (xhr) {
+            console.log('OK', xhr);
+        }, function (xhr) {
+            console.log('KO', xhr);
+        });
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
